@@ -1,0 +1,69 @@
+- name: "Download Java 8"
+  get_url:
+    url: https://javadl.oracle.com/webapps/download/AutoDL?BundleId=236877_42970487e3af4f5aa5bca3f542482c60
+    dest: /tmp
+    headers: {"Cookie": "gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie"}
+    validate_certs: no
+    mode: 0644
+
+- name: "Install Java 8"
+  yum:
+    name: /tmp/jre-8u201-linux-x64.rpm
+    state: present
+
+- name: "Copy RHEL 7 SIO Files"
+  copy:
+    src: ./files/
+    dest: /tmp/
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Install SIO Gateway"
+  yum:
+    name: '/tmp/EMC-ScaleIO-gateway-{{ vxflex_version }}.x86_64.rpm'
+    state: present
+  environment:
+    GATEWAY_ADMIN_PASSWORD: "{{ vxflex_gateway_pw }}"
+
+
+- name: "Add IP address in the gatewayUser.properties file"
+  lineinfile:
+    path: /opt/emc/scaleio/gateway/webapps/ROOT/WEB-INF/classes/gatewayUser.properties
+    regexp: '^mdm.ip.addresses'
+    insertafter: '= '
+    line: 'mdm.ip.addresses={{ vxflex_master_mdm_mgmt_ip | join(",") }},{{ vxflex_standby_mdm_mgmt_ip | join(",") }}'
+
+- name: "Gateway will trust the MDM certificate automatically"
+  lineinfile:
+    path: /opt/emc/scaleio/gateway/webapps/ROOT/WEB-INF/classes/gatewayUser.properties
+    regexp: '^gateway-security.allow_non_secure_communication'
+    insertafter: '= '
+    line: 'gateway-security.allow_non_secure_communication=true'
+
+- name: "Gateway will trust the MDM certificate automatically"
+  lineinfile:
+    path: /opt/emc/scaleio/gateway/webapps/ROOT/WEB-INF/classes/gatewayUser.properties
+    regexp: '^security.bypass_certificate_check'
+    insertafter: '= '
+    line: 'security.bypass_certificate_check=true'
+
+- name: "Change gateway http port to 8080"
+  lineinfile:
+    path: /opt/emc/scaleio/gateway/conf/catalina.properties
+    regexp: '^http.port'
+    insertafter: '= '
+    line: "http.port={{ vxflex_gateway_http_port }}"
+
+- name: "Change gateway https port to 8443"
+  lineinfile:
+    path: /opt/emc/scaleio/gateway/conf/catalina.properties
+    regexp: '^ssl.port'
+    insertafter: '= '
+    line: "ssl.port={{ vxflex_gateway_https_port }}"
+
+- name: "Restart Gateway Service"
+  systemd:
+    name: scaleio-gateway
+    enabled: yes
+    state: restarted
