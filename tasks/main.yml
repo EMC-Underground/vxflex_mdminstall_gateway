@@ -13,7 +13,7 @@
 
 - name: "Copy RHEL 7 SIO Files"
   copy:
-    src: ./files/
+    src: ./files/EMC-ScaleIO-gateway-{{ vxflex_version }}.x86_64.rpm
     dest: /tmp/
     owner: root
     group: root
