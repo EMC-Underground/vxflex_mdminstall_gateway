@@ -40,7 +40,7 @@
     path: /opt/emc/scaleio/gateway/webapps/ROOT/WEB-INF/classes/gatewayUser.properties
     regexp: '^mdm.ip.addresses'
     insertafter: '= '
-    line: 'mdm.ip.addresses={{ vxflex_vip_ip }},{{ vxflex_master_mdm_mgmt_ip | join(",") }},{{ vxflex_standby_mdm_mgmt_ip | join(",") }}'
+    line: 'mdm.ip.addresses={{ vxflex_vip_ip }}'
   tags:
     - install_gateway
 
@@ -62,7 +62,7 @@
   tags:
     - install_gateway
 
-- name: "Change gateway http port to 8080"
+- name: "Change gateway http port to {{ vxflex_gateway_http_port }}"
   lineinfile:
     path: /opt/emc/scaleio/gateway/conf/catalina.properties
     regexp: '^http.port'
@@ -71,7 +71,7 @@
   tags:
     - install_gateway
 
-- name: "Change gateway https port to 8443"
+- name: "Change gateway https port to {{ vxflex_gateway_https_port }}"
   lineinfile:
     path: /opt/emc/scaleio/gateway/conf/catalina.properties
     regexp: '^ssl.port'
