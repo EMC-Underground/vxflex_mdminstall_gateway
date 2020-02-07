@@ -1,2 +1,5 @@
 ---
 # defaults file for vxflex_mdminstall_gateway
+vxflex_gateway_pw: Password#1
+vxflex_gateway_http_port: 80
+vxflex_gateway_https_port: 443
