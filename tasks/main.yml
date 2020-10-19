@@ -29,6 +29,7 @@
   yum:
     name: '/tmp/EMC-ScaleIO-gateway-{{ vxflex_version }}.x86_64.rpm'
     state: present
+    disable_gpg_check: yes
   environment:
     GATEWAY_ADMIN_PASSWORD: "{{ vxflex_gateway_pw }}"
   tags:
